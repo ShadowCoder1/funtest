@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Situationship Decoder: Find Out Where You Actually Stand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #f0ece4;
+    --text-muted: #666;
+    --text-dim: #999;
+    --accent: #ff3b5c;
+    --accent2: #ff8c42;
+    --accent3: #ffd166;
+    --green: #06d6a0;
+    --pink: #ff6b9d;
+    --purple: #c77dff;
+    --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(255,59,92,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(199,125,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 60% 10%, rgba(255,140,66,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: var(--grain);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* HEADER */
+  header {
+    padding: 48px 0 0;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .eyebrow::before, .eyebrow::after {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 12vw, 110px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  h1 span {
+    color: var(--accent);
+    display: block;
+  }
+
+  .subtitle {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(16px, 2.5vw, 20px);
+    color: var(--text-dim);
+    margin-bottom: 48px;
+    line-height: 1.4;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* INPUT SECTION */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .input-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .input-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-label .num {
+    background: var(--accent);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 16px;
+    resize: none;
+    transition: border-color 0.2s;
+    min-height: 180px;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea::placeholder {
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .format-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* CONTEXT ROW */
+  .context-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 500px) {
+    .context-row { grid-template-columns: 1fr; }
+  }
+
+  .context-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .context-card .input-label {
+    margin-bottom: 10px;
+  }
+
+  select, input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  select:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  select option {
+    background: #1a1a1a;
+  }
+
+  .select-wrapper {
+    position: relative;
+  }
+
+  .select-wrapper::after {
+    content: '↓';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    font-size: 12px;
+  }
+
+  /* DECODE BUTTON */
+  .decode-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.1em;
+    padding: 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 30px rgba(255, 59, 92, 0.3);
+  }
+
+  .decode-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(255, 59, 92, 0.45);
+  }
+
+  .decode-btn:active {
+    transform: translateY(0);
+  }
+
+  .decode-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  }
+
+  .decode-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* LOADING */
+  .loading-state {
+    display: none;
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .loading-state.active {
+    display: block;
+  }
+
+  .loading-pulse {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  .pulse-dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
+  .pulse-dot:nth-child(3) { animation-delay: 0.4s; background: var(--accent3); }
+
+  @keyframes pulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .loading-text {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--text-dim);
+    animation: fadeText 3s ease-in-out infinite;
+  }
+
+  @keyframes fadeText {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* RESULTS */
+  #results {
+    display: none;
+    animation: slideUp 0.5s ease;
+  }
+
+  #results.active {
+    display: block;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .results-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .verdict-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+  }
+
+  .results-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 60px);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  /* INTEREST BAR */
+  .interest-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interest-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .interest-names {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .interest-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+  }
+
+  .interest-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .interest-bar-track {
+    height: 12px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .interest-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .interest-subtext {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  /* METRICS GRID */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 500px) {
+    .metrics-grid { grid-template-columns: 1fr; }
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .metric-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .metric-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .metric-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .metric-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+    position: relative;
+    top: -1px;
+  }
+
+  /* BRUTAL TRUTHS */
+  .truths-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .truths-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .truths-icon {
+    font-size: 20px;
+  }
+
+  .truths-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  .truth-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .truth-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .truth-item:first-child {
+    padding-top: 0;
+  }
+
+  .truth-bullet {
+    width: 24px;
+    height: 24px;
+    background: rgba(255,59,92,0.15);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .truth-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .truth-text strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* WHAT TO DO */
+  .moves-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .move-item {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .move-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .move-item:first-child { padding-top: 0; }
+
+  .move-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent3);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 24px;
+  }
+
+  .move-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .move-text strong {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+    font-size: 15px;
+  }
+
+  /* FINAL VERDICT */
+  .verdict-card {
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .verdict-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,59,92,0.12), rgba(199,125,255,0.08));
+  }
+
+  .verdict-card > * { position: relative; z-index: 1; }
+
+  .verdict-emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .verdict-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    letter-spacing: 0.03em;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .verdict-body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin: 0 auto;
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+  }
+
+  /* SHARE SECTION */
+  .share-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .share-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .share-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .share-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .share-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255,59,92,0.25);
+  }
+
+  .share-btn.primary:hover {
+    background: #ff1a3f;
+    color: white;
+  }
+
+  .retry-btn {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 16px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .retry-btn:hover {
+    border-color: var(--text-muted);
+    color: var(--text);
+  }
+
+  /* ERROR */
+  .error-state {
+    display: none;
+    background: rgba(255,59,92,0.08);
+    border: 1px solid rgba(255,59,92,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .error-state.active { display: block; }
+
+  .error-state p {
+    font-size: 14px;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    text-align: center;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .footer-text a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section-divider-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SCORE TAG */
+  .score-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .input-section { padding: 20px; }
+    .interest-card, .truths-card, .moves-card, .share-section { padding: 20px; }
+    .verdict-card { padding: 24px; }
+    .stats-bar { gap: 20px; }
+  }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: relative;
+  }
+
+  .char-count {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .red-flag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .flag-tag {
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .flag-red { background: rgba(255,59,92,0.12); color: #ff6b87; border: 1px solid rgba(255,59,92,0.2); }
+
+  /* INPUT TABS */
+  .input-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .input-tab {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .input-tab:hover {
+    border-color: #444;
+    color: var(--text);
+  }
+
+  .input-tab.active {
+    background: var(--surface2);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+
+  /* DROP ZONE */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface2);
+    margin-bottom: 12px;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(255,59,92,0.04);
+  }
+
+
+  .drop-zone-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .drop-zone-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* SCREENSHOT PREVIEWS */
+  .screenshot-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 4px 0;
+  }
+
+  .screenshot-thumb {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .screenshot-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .screenshot-thumb .remove-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 18px;
+    height: 18px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    color: white;
+    border: none;
+    line-height: 1;
+  }
+
+  .add-more-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px dashed var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .add-more-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* DISCLAIMER */
+  .input-disclaimer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    letter-spacing: 0.04em;
+  }
+  .flag-yellow { background: rgba(255,209,102,0.1); color: #ffd166; border: 1px solid rgba(255,209,102,0.2); }
+  .flag-green { background: rgba(6,214,160,0.1); color: var(--green); border: 1px solid rgba(6,214,160,0.2); }
+
+  /* PAYWALL */
+  .paywall-gate {
+    background: var(--surface);
+    border: 1px solid rgba(255,59,92,0.25);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .paywall-gate::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+
+  .blurred-truth {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blurred-truth .truth-text {
+    filter: blur(4px);
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .blurred-truth::after {
+    content: 'UNLOCK TO READ';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    background: rgba(17,17,17,0.7);
+    backdrop-filter: blur(2px);
+  }
+
+  .paywall-body {
+    padding: 28px 28px 32px;
+    text-align: center;
+  }
+
+  .paywall-lock-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,59,92,0.1);
+    border: 1px solid rgba(255,59,92,0.25);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 22px;
+  }
+
+  .paywall-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    line-height: 1.1;
+  }
+
+  .paywall-subtext {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 22px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .paywall-subtext strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .paywall-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+    text-align: left;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .paywall-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .paywall-feature-check {
+    color: var(--green);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .paywall-cta-btn {
+    width: 100%;
+    max-width: 340px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    padding: 20px 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 4px 28px rgba(255,59,92,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin: 0 auto 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .paywall-cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
+  }
+
+  .paywall-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(255,59,92,0.55);
+  }
+
+  .paywall-price-pill {
+    background: rgba(0,0,0,0.2);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .paywall-trust {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+  }
+
+  .paywall-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,209,102,0.07);
+    border: 1px solid rgba(255,209,102,0.18);
+    border-radius: 100px;
+    padding: 7px 16px;
+    font-size: 12px;
+    color: var(--accent3);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+  }
+
+  .timer-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent3);
+    animation: blink 1s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+  }
+
+  .paywall-social-proof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .proof-avatars {
+    display: flex;
+  }
+
+  .proof-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    margin-left: -7px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+  }
+
+  .proof-avatar:first-child { margin-left: 0; }
+</style>
+</head>
+<body>
+
+<div class="grain-overlay"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="eyebrow">AI Relationship Analysis</div>
+    <h1>Situationship<span>Decoder</span></h1>
+    <p class="subtitle">Paste your conversation. Get the truth you've been avoiding.</p>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num">94%</div>
+        <div class="stat-label">Accuracy rate</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">47K+</div>
+        <div class="stat-label">Decoded</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3 min</div>
+        <div class="stat-label">Avg read time</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- INPUT FORM -->
+  <div id="inputSection">
+
+    <!-- TAB SWITCHER -->
+    <div class="input-tabs">
+      <button class="input-tab active" id="tabPaste" onclick="switchTab('paste')">
+        Type or Paste
+      </button>
+      <button class="input-tab" id="tabUpload" onclick="switchTab('upload')">
+        Upload Screenshots
+      </button>
+    </div>
+
+    <!-- PASTE PANEL -->
+    <div class="input-section" id="panelPaste">
+      <div class="input-label">
+        <span class="num">1</span>
+        Paste your conversation
+      </div>
+      <textarea id="convInput" placeholder="Me: hey are you free tonight
+Them: maybe, why
+Me: wanted to hang
+Them: [seen - no reply for 4 hrs]
+Me: no worries if busy!
+Them: oh sorry yeah been crazy
+
+Label messages Me: and Them: and note any read receipts or long gaps." maxlength="8000"></textarea>
+      <div class="format-hint">The more context the better. Include gaps, read receipts, who texts first.</div>
+    </div>
+
+    <!-- UPLOAD PANEL -->
+    <div class="input-section" id="panelUpload" style="display:none;">
+      <div class="input-label">
+        <span class="num">1</span>
+        Upload screenshots
+      </div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div class="drop-zone-title">Tap to select screenshots</div>
+        <div class="drop-zone-sub">From your camera roll, iMessage, Instagram, any app.<br>Add multiple images for a longer conversation.</div>
+      </div>
+      <div class="screenshot-previews" id="screenshotPreviews" style="display:none;"></div>
+      <div class="format-hint">Screenshots are read by AI and never stored. Add as many as needed.</div>
+    </div>
+
+    <!-- CONTEXT ROW -->
+    <div class="context-row">
+      <div class="context-card">
+        <div class="input-label">
+          <span class="num">2</span>
+          Who is this
+        </div>
+        <div class="select-wrapper">
+          <select id="relType">
+            <option value="dating">Dating / Situationship</option>
+            <option value="ex">Ex</option>
+            <option value="crush">Crush</option>
+            <option value="friends">Friend</option>
+            <option value="coworker">Coworker</option>
+            <option value="longterm">Partner</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="context-card">
+        <div class="input-label">
+          <span class="num">3</span>
+          What you want
+        </div>
+        <div class="select-wrapper">
+          <select id="goalType">
+            <option value="truth">Just the truth</option>
+            <option value="together">Want to be together</option>
+            <option value="move_on">Need to move on</option>
+            <option value="repair">Fix things</option>
+            <option value="protect">Protect myself</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-state" id="errorState">
+      <p id="errorMsg">Something went wrong. Please try again.</p>
+    </div>
+
+    <button class="decode-btn" id="decodeBtn" onclick="runDecode()">
+      DECODE THE SITUATION
+    </button>
+
+    <p class="input-disclaimer">Your conversation is never stored or used for training.</p>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loadingState">
+    <div class="loading-pulse">
+      <div class="pulse-dot"></div>
+      <div class="pulse-dot"></div>
+      <div class="pulse-dot"></div>
+    </div>
+    <p class="loading-text" id="loadingText">Reading between the lines...</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- VERDICT HEADER -->
+    <div class="results-header">
+      <div class="verdict-badge" id="verdictBadge"></div>
+      <div class="results-title" id="resultsTitle"></div>
+    </div>
+
+    <!-- INTEREST METER -->
+    <div class="interest-card">
+      <div class="interest-label">Interest & Investment Analysis</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+        <div>
+          <div class="interest-name">You</div>
+          <div class="interest-pct" id="youPct" style="color:var(--accent2)">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="interest-name">Them</div>
+          <div class="interest-pct" id="themPct" style="color:var(--purple)">—</div>
+        </div>
+      </div>
+      <div class="interest-bar-track">
+        <div class="interest-bar-fill" id="interestFill" style="width:50%"></div>
+      </div>
+      <div class="interest-subtext" id="interestSubtext"></div>
+    </div>
+
+    <!-- METRICS GRID -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-title">Their Communication Style</div>
+        <div class="metric-value" id="metricStyle">—</div>
+        <div class="metric-sub" id="metricStyleSub">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Emotional Availability</div>
+        <div class="metric-value" id="metricAvail">—</div>
+        <div class="metric-sub" id="metricAvailSub">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Power Dynamic</div>
+        <div class="metric-value" id="metricPower">—</div>
+        <div class="metric-sub" id="metricPowerSub">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">Trajectory</div>
+        <div class="metric-value" id="metricTraj">—</div>
+        <div class="metric-sub" id="metricTrajSub">—</div>
+      </div>
+    </div>
+
+    <!-- FLAGS ROW -->
+    <div class="truths-card" style="margin-bottom:16px; padding-bottom:20px;">
+      <div class="truths-header">
+        <span class="truths-icon">🚩</span>
+        <div class="truths-title">Flags Detected</div>
+      </div>
+      <div class="red-flag-row" id="flagsRow"></div>
+    </div>
+
+    <!-- BRUTAL TRUTHS -->
+    <div class="truths-card">
+      <div class="truths-header">
+        <span class="truths-icon">🔍</span>
+        <div class="truths-title">The Brutal Truth</div>
+      </div>
+      <div id="brutalTruths"></div>
+    </div>
+
+    <!-- WHAT TO DO -->
+    <div class="moves-card" style="margin-top:16px;">
+      <div class="truths-header">
+        <span class="truths-icon">🎯</span>
+        <div class="truths-title" style="color:var(--accent3);">Your Next Moves</div>
+      </div>
+      <div id="nextMoves"></div>
+    </div>
+
+    <!-- FINAL VERDICT -->
+    <div class="verdict-card" style="margin-top:16px; border:1px solid rgba(255,59,92,0.2);">
+      <span class="verdict-emoji" id="verdictEmoji"></span>
+      <div class="verdict-headline" id="verdictHeadline"></div>
+      <div class="verdict-body" id="verdictBody"></div>
+    </div>
+
+    <!-- SHARE -->
+    <div class="share-section">
+      <div class="share-title">THIS WILL BREAK SOMEONE'S PHONE</div>
+      <div class="share-sub">Send to the friend who needs to hear this.</div>
+      <div class="share-buttons">
+        <button class="share-btn primary" onclick="copyResult()">Copy Results</button>
+        <button class="share-btn" onclick="shareToTwitter()">Post to X</button>
+        <button class="share-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">Decode Another</button>
+      </div>
+    </div>
+
+    <button class="retry-btn" onclick="resetForm()">← Start Over</button>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p class="footer-text">
+      Situationship Decoder uses AI to analyze communication patterns, not to tell your future, but to reflect what's already there.<br>
+      For entertainment and self-reflection. Results are probabilistic, not guaranteed. Be kind to yourself.
+    </p>
+  </div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/REPLACE_WITH_YOUR_LINK';
+const PRICE = '$2.99';
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let lastResult = null;
+let savedConv = null;
+let savedImages = []; // base64 image arrays for screenshot mode
+let savedRel = null;
+let savedGoal = null;
+let activeTab = 'paste';
+
+// ─────────────────────────────────────────────
+// TAB SWITCHING
+// ─────────────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tabPaste').classList.toggle('active', tab === 'paste');
+  document.getElementById('tabUpload').classList.toggle('active', tab === 'upload');
+  document.getElementById('panelPaste').style.display = tab === 'paste' ? 'block' : 'none';
+  document.getElementById('panelUpload').style.display = tab === 'upload' ? 'block' : 'none';
+}
+
+// ─────────────────────────────────────────────
+// SCREENSHOT HANDLING
+// ─────────────────────────────────────────────
+let uploadedImages = []; // { dataUrl, base64, name }
+
+function handleFiles(files) {
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      const mediaType = file.type;
+      uploadedImages.push({ dataUrl, base64, mediaType, name: file.name });
+      renderPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPreviews() {
+  const container = document.getElementById('screenshotPreviews');
+  const dropZone = document.getElementById('dropZone');
+
+  if (uploadedImages.length === 0) {
+    container.style.display = 'none';
+    dropZone.style.display = 'block';
+    return;
+  }
+
+  dropZone.style.display = 'none';
+  container.style.display = 'flex';
+  container.innerHTML = '';
+
+  uploadedImages.forEach((img, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'screenshot-thumb';
+    thumb.innerHTML = `
+      <img src="${img.dataUrl}" alt="Screenshot ${i+1}">
+      <button class="remove-btn" onclick="removeImage(${i})">x</button>
+    `;
+    container.appendChild(thumb);
+  });
+
+  // Add more button
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-more-btn';
+  addBtn.textContent = '+';
+  addBtn.onclick = () => document.getElementById('fileInput').click();
+  container.appendChild(addBtn);
+}
+
+function removeImage(index) {
+  uploadedImages.splice(index, 1);
+  renderPreviews();
+  if (uploadedImages.length === 0) {
+    document.getElementById('dropZone').style.display = 'block';
+  }
+}
+
+// Drag and drop
+const dropZoneEl = document.getElementById('dropZone');
+['dragenter','dragover'].forEach(e => {
+  dropZoneEl.addEventListener(e, (ev) => {
+    ev.preventDefault();
+    dropZoneEl.classList.add('dragover');
+  });
+});
+['dragleave','drop'].forEach(e => {
+  dropZoneEl.addEventListener(e, (ev) => {
+    ev.preventDefault();
+    dropZoneEl.classList.remove('dragover');
+    if (e === 'drop' && ev.dataTransfer.files.length) {
+      handleFiles(ev.dataTransfer.files);
+    }
+  });
+});
+
+// ─────────────────────────────────────────────
+// LOADING TEXTS
+// ─────────────────────────────────────────────
+const loadingTexts = [
+  "Reading between the lines...",
+  "Analyzing response times...",
+  "Detecting emotional patterns...",
+  "Calculating who's trying harder...",
+  "Identifying red flags...",
+  "Processing the things left unsaid...",
+  "Measuring the vibe...",
+];
+let loadingInterval;
+
+function cycleLoadingText() {
+  let i = 0;
+  const el = document.getElementById('loadingText');
+  el.textContent = loadingTexts[0];
+  loadingInterval = setInterval(() => {
+    i = (i + 1) % loadingTexts.length;
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = loadingTexts[i]; el.style.opacity = ''; }, 300);
+  }, 2200);
+}
+
+// ─────────────────────────────────────────────
+// CHECK URL FOR STRIPE SUCCESS
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('paid') === 'true') {
+    const saved = sessionStorage.getItem('pendingDecode');
+    if (saved) {
+      const { conv, images, relType, goalType } = JSON.parse(saved);
+      sessionStorage.removeItem('pendingDecode');
+      window.history.replaceState({}, '', window.location.pathname);
+      runDecodeWithData(conv, images || [], relType, goalType, true);
+    }
+  }
+});
+
+// ─────────────────────────────────────────────
+// MAIN ENTRY
+// ─────────────────────────────────────────────
+async function runDecode() {
+  const relType = document.getElementById('relType').value;
+  const goalType = document.getElementById('goalType').value;
+
+  if (activeTab === 'paste') {
+    const conv = document.getElementById('convInput').value.trim();
+    await runDecodeWithData(conv, [], relType, goalType, false);
+  } else {
+    if (uploadedImages.length === 0) {
+      showError('Add at least one screenshot to continue.');
+      return;
+    }
+    await runDecodeWithData('', uploadedImages, relType, goalType, false);
+  }
+}
+
+async function runDecodeWithData(conv, images, relType, goalType, paid) {
+  const errorState = document.getElementById('errorState');
+  errorState.classList.remove('active');
+
+  // Validate
+  if (images.length === 0 && (!conv || conv.length < 60)) {
+    showError('Paste at least a few exchanges so there is something to analyze.');
+    return;
+  }
+
+  // Save for post-payment re-run
+  savedConv = conv;
+  savedImages = images;
+  savedRel = relType;
+  savedGoal = goalType;
+
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('loadingState').classList.add('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('decodeBtn').disabled = true;
+  cycleLoadingText();
+
+  try {
+    const payload = { relType, goalType, paid };
+
+    if (images.length > 0) {
+      // Send images as base64 array
+      payload.images = images.map(img => ({ base64: img.base64, mediaType: img.mediaType }));
+    } else {
+      payload.conversation = conv;
+    }
+
+    const response = await fetch('/api/decode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    const result = await response.json();
+    if (result.error) throw new Error(result.error);
+
+    lastResult = result;
+    clearInterval(loadingInterval);
+    renderResults(result);
+
+  } catch (err) {
+    clearInterval(loadingInterval);
+    console.error(err);
+    document.getElementById('loadingState').classList.remove('active');
+    document.getElementById('inputSection').style.display = 'block';
+    document.getElementById('decodeBtn').disabled = false;
+    showError('Something went wrong. Try again. (' + err.message + ')');
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorState');
+  document.getElementById('errorMsg').textContent = msg;
+  el.classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// RENDER RESULTS
+// ─────────────────────────────────────────────
+function renderResults(r) {
+  const badge = document.getElementById('verdictBadge');
+  badge.textContent = r.verdictCategory;
+  badge.style.background = (r.verdictColor || '#ff3b5c') + '22';
+  badge.style.color = r.verdictColor || '#ff3b5c';
+  badge.style.border = `1px solid ${r.verdictColor || '#ff3b5c'}44`;
+
+  document.getElementById('resultsTitle').textContent = r.verdictHeadline;
+
+  const you = Math.max(0, Math.min(100, r.youInterest));
+  const them = Math.max(0, Math.min(100, r.themInterest));
+  document.getElementById('youPct').textContent = you + '%';
+  document.getElementById('themPct').textContent = them + '%';
+  document.getElementById('interestFill').style.width = you + '%';
+  document.getElementById('interestSubtext').textContent = r.interestSubtext;
+
+  document.getElementById('metricStyle').textContent = r.commStyle;
+  document.getElementById('metricStyleSub').textContent = r.commStyleSub;
+  document.getElementById('metricAvail').textContent = r.emotionalAvail;
+  document.getElementById('metricAvailSub').textContent = r.emotionalAvailSub;
+  document.getElementById('metricPower').textContent = r.powerDynamic;
+  document.getElementById('metricPowerSub').textContent = r.powerDynamicSub;
+  document.getElementById('metricTraj').textContent = r.trajectory;
+  document.getElementById('metricTrajSub').textContent = r.trajectorySub;
+
+  const flagsRow = document.getElementById('flagsRow');
+  flagsRow.innerHTML = '';
+  (r.flags || []).forEach(f => {
+    const tag = document.createElement('span');
+    tag.className = `flag-tag flag-${f.type}`;
+    const icons = { red: '🚩', yellow: '⚠️', green: '✅' };
+    tag.textContent = icons[f.type] + ' ' + f.label;
+    flagsRow.appendChild(tag);
+  });
+
+  const truthsEl = document.getElementById('brutalTruths');
+  truthsEl.innerHTML = '';
+  (r.brutalTruths || []).forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'truth-item';
+    div.innerHTML = `<div class="truth-bullet">${t.emoji}</div><div class="truth-text">${t.text}</div>`;
+    truthsEl.appendChild(div);
+  });
+
+  // Next Moves — paywalled or unlocked
+  const movesCard = document.querySelector('.moves-card');
+
+  if (r.paywalled) {
+    const expiryMs = Date.now() + 24 * 60 * 60 * 1000;
+    sessionStorage.setItem('decodeExpiry', expiryMs);
+
+    movesCard.className = 'paywall-gate';
+    movesCard.innerHTML = `
+      <div class="blurred-truth">
+        <div class="truth-bullet" style="background:rgba(255,59,92,0.15); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">!</div>
+        <div class="truth-text" style="font-size:15px; line-height:1.5;">
+          The most important pattern in this conversation — the one that explains everything — is something you've probably already felt but haven't been able to name.
+        </div>
+      </div>
+      <div class="paywall-body">
+        <div class="paywall-lock-icon">🔒</div>
+        <div class="paywall-headline">Your Full Read Is Ready</div>
+        <p class="paywall-subtext">
+          The analysis is complete. You've seen the surface.<br>
+          <strong>What's locked</strong> is the pattern that explains their behavior and exactly what to do next.
+        </p>
+        <div class="paywall-features">
+          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>The hidden pattern driving their behavior</span></div>
+          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>3 moves tailored to your exact situation</span></div>
+          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>What to say (and not say) next</span></div>
+        </div>
+        <div class="paywall-timer"><span class="timer-dot"></span><span>Results expire in <span id="countdownTimer">23:59:59</span></span></div>
+        <button class="paywall-cta-btn" onclick="handlePayment()">
+          GET THE FULL READ <span class="paywall-price-pill">${PRICE}</span>
+        </button>
+        <div class="paywall-trust">Secure payment via Stripe &nbsp;·&nbsp; One-time &nbsp;·&nbsp; Instant unlock</div>
+        <div class="paywall-social-proof">
+          <div class="proof-avatars">
+            <div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div>
+          </div>
+          <span>47,291 people have unlocked their full read</span>
+        </div>
+      </div>
+    `;
+    startCountdown(expiryMs);
+
+  } else {
+    movesCard.className = 'moves-card';
+    movesCard.innerHTML = `
+      <div class="truths-header">
+        <span class="truths-icon">🎯</span>
+        <div class="truths-title" style="color:var(--accent3);">Your Next Moves</div>
+      </div>
+      <div id="nextMoves"></div>
+    `;
+    const movesElFresh = document.getElementById('nextMoves');
+    (r.nextMoves || []).forEach((m, i) => {
+      const div = document.createElement('div');
+      div.className = 'move-item';
+      div.innerHTML = `<div class="move-num">0${i+1}</div><div class="move-text"><strong>${m.title}</strong>${m.detail}</div>`;
+      movesElFresh.appendChild(div);
+    });
+  }
+
+  document.getElementById('verdictEmoji').textContent = r.verdictEmoji;
+  document.getElementById('verdictHeadline').textContent = r.verdictHeadline;
+  document.getElementById('verdictBody').textContent = r.verdictBody;
+
+  document.getElementById('loadingState').classList.remove('active');
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  setTimeout(() => resultsEl.classList.add('active'), 10);
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─────────────────────────────────────────────
+// COUNTDOWN TIMER
+// ─────────────────────────────────────────────
+let countdownInterval;
+
+function startCountdown(expiryMs) {
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    const remaining = expiryMs - Date.now();
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      const el = document.getElementById('countdownTimer');
+      if (el) el.textContent = 'EXPIRED';
+      return;
+    }
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    const el = document.getElementById('countdownTimer');
+    if (el) el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+// PAYMENT
+// ─────────────────────────────────────────────
+function handlePayment() {
+  sessionStorage.setItem('pendingDecode', JSON.stringify({
+    conv: savedConv,
+    images: savedImages,
+    relType: savedRel,
+    goalType: savedGoal
+  }));
+  const successUrl = encodeURIComponent(window.location.origin + window.location.pathname + '?paid=true');
+  window.location.href = STRIPE_PAYMENT_LINK + '?success_url=' + successUrl;
+}
+
+// ─────────────────────────────────────────────
+// SHARE / RESET
+// ─────────────────────────────────────────────
+function copyResult() {
+  if (!lastResult) return;
+  const r = lastResult;
+  const text = `Situationship Decoded\n\n${r.verdictHeadline}\n\nYou: ${r.youInterest}% invested | Them: ${r.themInterest}% invested\n\nThe Verdict: ${r.verdictBody}\n\nsituationshipdecoder.com`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.share-btn.primary');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Results', 2000);
+  });
+}
+
+function shareToTwitter() {
+  if (!lastResult) return;
+  const r = lastResult;
+  const text = encodeURIComponent(`just decoded my situationship and i'm not okay\n\n"${r.verdictHeadline}"\n\nme: ${r.youInterest}% | them: ${r.themInterest}%\n\nsituationshipdecoder.com`);
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+}
+
+function resetForm() {
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('inputSection').style.display = 'block';
+  document.getElementById('decodeBtn').disabled = false;
+  document.getElementById('convInput').value = '';
+  uploadedImages = [];
+  renderPreviews();
+  switchTab('paste');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  lastResult = null; savedConv = null; savedImages = [];
+}
+</script>
+
+</body>
+</html>
