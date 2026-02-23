@@ -840,10 +840,39 @@
 
   /* RESPONSIVE */
   @media (max-width: 600px) {
-    .input-section { padding: 20px; }
-    .interest-card, .truths-card, .moves-card, .share-section { padding: 20px; }
-    .verdict-card { padding: 24px; }
-    .stats-bar { gap: 20px; }
+    .container { padding: 0 16px 40px; }
+    h1 { font-size: clamp(48px, 14vw, 80px); }
+    .subtitle { font-size: 15px; }
+    .stats-bar { gap: 16px; }
+    .stat-num { font-size: 22px; }
+
+    .input-section { padding: 18px; }
+    .input-tabs { gap: 6px; }
+    .input-tab { font-size: 12px; padding: 11px 10px; }
+
+    .context-row { grid-template-columns: 1fr; gap: 10px; }
+
+    .interest-card, .truths-card, .share-section { padding: 18px; }
+    .verdict-card { padding: 20px; }
+    .verdict-emoji { font-size: 36px; }
+    .verdict-headline { font-size: 22px; }
+
+    .metrics-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .metric-card { padding: 14px; }
+    .metric-value { font-size: 13px; }
+
+    .move-item { flex-direction: column; gap: 6px; }
+    .move-num { font-size: 28px; }
+
+    .share-buttons { flex-direction: column; }
+    .share-btn { width: 100%; justify-content: center; }
+
+    .paywall-body { padding: 20px 18px 24px; }
+    .paywall-headline { font-size: 22px; }
+    .paywall-cta-btn { font-size: 18px; padding: 16px 20px; }
+
+    .screenshot-previews { gap: 8px; }
+    .screenshot-thumb, .add-more-btn { width: 70px; height: 70px; }
   }
 
   /* TOOLTIP */
