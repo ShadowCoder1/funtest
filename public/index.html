@@ -1430,31 +1430,7 @@ Label messages Me: and Them: and note any read receipts or long gaps." maxlength
       <div class="interest-subtext" id="interestSubtext"></div>
     </div>
 
-    <!-- METRICS GRID -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-title">Their Communication Style</div>
-        <div class="metric-value" id="metricStyle">—</div>
-        <div class="metric-sub" id="metricStyleSub">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-title">Emotional Availability</div>
-        <div class="metric-value" id="metricAvail">—</div>
-        <div class="metric-sub" id="metricAvailSub">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-title">Power Dynamic</div>
-        <div class="metric-value" id="metricPower">—</div>
-        <div class="metric-sub" id="metricPowerSub">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-title">Trajectory</div>
-        <div class="metric-value" id="metricTraj">—</div>
-        <div class="metric-sub" id="metricTrajSub">—</div>
-      </div>
-    </div>
-
-    <!-- FLAGS ROW -->
+    <!-- FLAGS ROW — always visible, max 2 free -->
     <div class="truths-card" style="margin-bottom:16px; padding-bottom:20px;">
       <div class="truths-header">
         <span class="truths-icon">🚩</span>
@@ -1463,29 +1439,61 @@ Label messages Me: and Them: and note any read receipts or long gaps." maxlength
       <div class="red-flag-row" id="flagsRow"></div>
     </div>
 
-    <!-- BRUTAL TRUTHS -->
-    <div class="truths-card">
-      <div class="truths-header">
-        <span class="truths-icon">🔍</span>
-        <div class="truths-title">The Brutal Truth</div>
-      </div>
-      <div id="brutalTruths"></div>
-    </div>
+    <!-- PAYWALL GATE — replaces metrics + truths + moves + verdict when locked -->
+    <div id="paywallSection"></div>
 
-    <!-- WHAT TO DO -->
-    <div class="moves-card" style="margin-top:16px;">
-      <div class="truths-header">
-        <span class="truths-icon">🎯</span>
-        <div class="truths-title" style="color:var(--accent3);">Your Next Moves</div>
-      </div>
-      <div id="nextMoves"></div>
-    </div>
+    <!-- PAID CONTENT — only shown when unlocked -->
+    <div id="paidContent" style="display:none;">
 
-    <!-- FINAL VERDICT -->
-    <div class="verdict-card" style="margin-top:16px; border:1px solid rgba(255,59,92,0.2);">
-      <span class="verdict-emoji" id="verdictEmoji"></span>
-      <div class="verdict-headline" id="verdictHeadline"></div>
-      <div class="verdict-body" id="verdictBody"></div>
+      <!-- METRICS GRID -->
+      <div class="metrics-grid" style="margin-bottom:16px;">
+        <div class="metric-card">
+          <div class="metric-title">Their Communication Style</div>
+          <div class="metric-value" id="metricStyle">—</div>
+          <div class="metric-sub" id="metricStyleSub">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Emotional Availability</div>
+          <div class="metric-value" id="metricAvail">—</div>
+          <div class="metric-sub" id="metricAvailSub">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Power Dynamic</div>
+          <div class="metric-value" id="metricPower">—</div>
+          <div class="metric-sub" id="metricPowerSub">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Trajectory</div>
+          <div class="metric-value" id="metricTraj">—</div>
+          <div class="metric-sub" id="metricTrajSub">—</div>
+        </div>
+      </div>
+
+      <!-- BRUTAL TRUTHS -->
+      <div class="truths-card">
+        <div class="truths-header">
+          <span class="truths-icon">🔍</span>
+          <div class="truths-title">The Brutal Truth</div>
+        </div>
+        <div id="brutalTruths"></div>
+      </div>
+
+      <!-- NEXT MOVES -->
+      <div class="moves-card" style="margin-top:16px;">
+        <div class="truths-header">
+          <span class="truths-icon">🎯</span>
+          <div class="truths-title" style="color:var(--accent3);">Your Next Moves</div>
+        </div>
+        <div id="nextMoves"></div>
+      </div>
+
+      <!-- FINAL VERDICT -->
+      <div class="verdict-card" style="margin-top:16px; border:1px solid rgba(255,59,92,0.2);">
+        <span class="verdict-emoji" id="verdictEmoji"></span>
+        <div class="verdict-headline" id="verdictHeadline"></div>
+        <div class="verdict-body" id="verdictBody"></div>
+      </div>
+
     </div>
 
     <!-- SHARE -->
@@ -1747,14 +1755,15 @@ function showError(msg) {
 // RENDER RESULTS
 // ─────────────────────────────────────────────
 function renderResults(r) {
+  // Badge + headline — always visible
   const badge = document.getElementById('verdictBadge');
   badge.textContent = r.verdictCategory;
   badge.style.background = (r.verdictColor || '#ff3b5c') + '22';
   badge.style.color = r.verdictColor || '#ff3b5c';
   badge.style.border = `1px solid ${r.verdictColor || '#ff3b5c'}44`;
-
   document.getElementById('resultsTitle').textContent = r.verdictHeadline;
 
+  // Interest meter — always visible
   const you = Math.max(0, Math.min(100, r.youInterest));
   const them = Math.max(0, Math.min(100, r.themInterest));
   document.getElementById('youPct').textContent = you + '%';
@@ -1762,97 +1771,102 @@ function renderResults(r) {
   document.getElementById('interestFill').style.width = you + '%';
   document.getElementById('interestSubtext').textContent = r.interestSubtext;
 
-  document.getElementById('metricStyle').textContent = r.commStyle;
-  document.getElementById('metricStyleSub').textContent = r.commStyleSub;
-  document.getElementById('metricAvail').textContent = r.emotionalAvail;
-  document.getElementById('metricAvailSub').textContent = r.emotionalAvailSub;
-  document.getElementById('metricPower').textContent = r.powerDynamic;
-  document.getElementById('metricPowerSub').textContent = r.powerDynamicSub;
-  document.getElementById('metricTraj').textContent = r.trajectory;
-  document.getElementById('metricTrajSub').textContent = r.trajectorySub;
-
+  // Flags — show max 2 when paywalled, all when paid
   const flagsRow = document.getElementById('flagsRow');
   flagsRow.innerHTML = '';
-  (r.flags || []).forEach(f => {
+  const flags = r.flags || [];
+  const visibleFlags = r.paywalled ? flags.slice(0, 2) : flags;
+  visibleFlags.forEach(f => {
     const tag = document.createElement('span');
     tag.className = `flag-tag flag-${f.type}`;
     const icons = { red: '🚩', yellow: '⚠️', green: '✅' };
     tag.textContent = icons[f.type] + ' ' + f.label;
     flagsRow.appendChild(tag);
   });
-
-  const truthsEl = document.getElementById('brutalTruths');
-  truthsEl.innerHTML = '';
-  (r.brutalTruths || []).forEach(t => {
-    const div = document.createElement('div');
-    div.className = 'truth-item';
-    div.innerHTML = `<div class="truth-bullet">${t.emoji}</div><div class="truth-text">${t.text}</div>`;
-    truthsEl.appendChild(div);
-  });
-
-  // Next Moves — paywalled or unlocked
-  const movesCard = document.querySelector('.moves-card');
+  if (r.paywalled && flags.length > 2) {
+    const more = document.createElement('span');
+    more.className = 'flag-tag flag-red';
+    more.style.opacity = '0.4';
+    more.textContent = `+${flags.length - 2} more`;
+    flagsRow.appendChild(more);
+  }
 
   if (r.paywalled) {
+    // Show paywall gate
     const expiryMs = Date.now() + 24 * 60 * 60 * 1000;
     sessionStorage.setItem('decodeExpiry', expiryMs);
-
-    movesCard.className = 'paywall-gate';
-    movesCard.innerHTML = `
-      <div class="blurred-truth">
-        <div class="truth-bullet" style="background:rgba(255,59,92,0.15); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">!</div>
-        <div class="truth-text" style="font-size:15px; line-height:1.5;">
-          The most important pattern in this conversation — the one that explains everything — is something you've probably already felt but haven't been able to name.
-        </div>
-      </div>
-      <div class="paywall-body">
-        <div class="paywall-lock-icon">🔒</div>
-        <div class="paywall-headline">Your Full Read Is Ready</div>
-        <p class="paywall-subtext">
-          The analysis is complete. You've seen the surface.<br>
-          <strong>What's locked</strong> is the pattern that explains their behavior and exactly what to do next.
-        </p>
-        <div class="paywall-features">
-          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>The hidden pattern driving their behavior</span></div>
-          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>3 moves tailored to your exact situation</span></div>
-          <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>What to say (and not say) next</span></div>
-        </div>
-        <div class="paywall-timer"><span class="timer-dot"></span><span>Results expire in <span id="countdownTimer">23:59:59</span></span></div>
-        <button class="paywall-cta-btn" onclick="handlePayment()">
-          GET THE FULL READ <span class="paywall-price-pill">${PRICE}</span>
-        </button>
-        <div class="paywall-trust">Secure payment via Stripe &nbsp;·&nbsp; One-time &nbsp;·&nbsp; Instant unlock</div>
-        <div class="paywall-social-proof">
-          <div class="proof-avatars">
-            <div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div>
+    document.getElementById('paidContent').style.display = 'none';
+    document.getElementById('paywallSection').innerHTML = `
+      <div class="paywall-gate">
+        <div class="blurred-truth">
+          <div style="font-size:15px; line-height:1.5; filter:blur(4px); user-select:none; opacity:0.5;">
+            The real pattern here isn't the response times. It's something deeper about how they engage with you emotionally — and it explains every confusing thing they've done.
           </div>
-          <span>47,291 people have unlocked their full read</span>
+        </div>
+        <div class="paywall-body">
+          <div class="paywall-lock-icon">🔒</div>
+          <div class="paywall-headline">Your Full Read Is Ready</div>
+          <p class="paywall-subtext">
+            You've seen the interest gap. Now find out <strong>why it exists</strong> and exactly what to do about it.
+          </p>
+          <div class="paywall-features">
+            <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>4 brutal truths with evidence from your conversation</span></div>
+            <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>Full breakdown: communication style, power dynamic, trajectory</span></div>
+            <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>3 specific next moves tailored to your goal</span></div>
+            <div class="paywall-feature"><span class="paywall-feature-check">✓</span><span>Final verdict on where this is actually going</span></div>
+          </div>
+          <div class="paywall-timer"><span class="timer-dot"></span><span>Results expire in <span id="countdownTimer">23:59:59</span></span></div>
+          <button class="paywall-cta-btn" onclick="handlePayment()">
+            GET THE FULL READ <span class="paywall-price-pill">${PRICE}</span>
+          </button>
+          <div class="paywall-trust">Secure payment via Stripe &nbsp;·&nbsp; One-time &nbsp;·&nbsp; Instant unlock</div>
+          <div class="paywall-social-proof">
+            <div class="proof-avatars">
+              <div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div><div class="proof-avatar">👤</div>
+            </div>
+            <span>47,291 people have unlocked their full read</span>
+          </div>
         </div>
       </div>
     `;
     startCountdown(expiryMs);
 
   } else {
-    movesCard.className = 'moves-card';
-    movesCard.innerHTML = `
-      <div class="truths-header">
-        <span class="truths-icon">🎯</span>
-        <div class="truths-title" style="color:var(--accent3);">Your Next Moves</div>
-      </div>
-      <div id="nextMoves"></div>
-    `;
-    const movesElFresh = document.getElementById('nextMoves');
+    // Show all paid content
+    document.getElementById('paywallSection').innerHTML = '';
+    document.getElementById('paidContent').style.display = 'block';
+
+    document.getElementById('metricStyle').textContent = r.commStyle;
+    document.getElementById('metricStyleSub').textContent = r.commStyleSub;
+    document.getElementById('metricAvail').textContent = r.emotionalAvail;
+    document.getElementById('metricAvailSub').textContent = r.emotionalAvailSub;
+    document.getElementById('metricPower').textContent = r.powerDynamic;
+    document.getElementById('metricPowerSub').textContent = r.powerDynamicSub;
+    document.getElementById('metricTraj').textContent = r.trajectory;
+    document.getElementById('metricTrajSub').textContent = r.trajectorySub;
+
+    const truthsEl = document.getElementById('brutalTruths');
+    truthsEl.innerHTML = '';
+    (r.brutalTruths || []).forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'truth-item';
+      div.innerHTML = `<div class="truth-bullet">${t.emoji}</div><div class="truth-text">${t.text}</div>`;
+      truthsEl.appendChild(div);
+    });
+
+    const movesEl = document.getElementById('nextMoves');
+    movesEl.innerHTML = '';
     (r.nextMoves || []).forEach((m, i) => {
       const div = document.createElement('div');
       div.className = 'move-item';
       div.innerHTML = `<div class="move-num">0${i+1}</div><div class="move-text"><strong>${m.title}</strong>${m.detail}</div>`;
-      movesElFresh.appendChild(div);
+      movesEl.appendChild(div);
     });
-  }
 
-  document.getElementById('verdictEmoji').textContent = r.verdictEmoji;
-  document.getElementById('verdictHeadline').textContent = r.verdictHeadline;
-  document.getElementById('verdictBody').textContent = r.verdictBody;
+    document.getElementById('verdictEmoji').textContent = r.verdictEmoji;
+    document.getElementById('verdictHeadline').textContent = r.verdictHeadline;
+    document.getElementById('verdictBody').textContent = r.verdictBody;
+  }
 
   document.getElementById('loadingState').classList.remove('active');
   const resultsEl = document.getElementById('results');
