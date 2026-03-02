@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { conversation, images, relType, goalType, paid } = req.body;
+  // 'paid' from client is INTENTIONALLY IGNORED — payment verified server-side only via /api/unlock
+  const { conversation, images, relType, goalType } = req.body;
 
   // Validate: need either text or images
   const hasText = conversation && conversation.trim().length >= 60;
@@ -53,7 +54,7 @@ Respond ONLY with a valid JSON object. No markdown, no preamble. Schema:
   "verdictCategory": "one of: Mutual Interest | Situationship | One-Sided | Fading Out | It's Complicated | Healthy | Toxic Pattern | Mixed Signals",
   "verdictColor": "hex color matching the mood (red=bad, green=good, purple=complex, orange=mixed)",
   "verdictEmoji": "single emoji",
-  "verdictHeadline": "punchy 6-10 word verdict specific to THIS conversation",
+  "verdictHeadline": "punchy 6-10 word TEASER that hints at the truth WITHOUT giving it away — create curiosity, not conclusions. E.g. 'The answer is buried in what they didn't say' not 'He is stringing you along'",
   "verdictBody": "2-3 sentences of honest nuanced summary, specific to this conversation",
   "youInterest": "number 0-100",
   "themInterest": "number 0-100",
@@ -127,13 +128,33 @@ Rules:
     const jsonStr = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const result = JSON.parse(jsonStr);
 
-    // Gate nextMoves behind payment
-    if (!paid) {
-      result.nextMoves = null;
-      result.paywalled = true;
-    }
+    // Always return paywalled free preview — full result stored in token for unlock
+    const freeResult = {
+      verdictCategory: result.verdictCategory,
+      verdictColor: result.verdictColor,
+      verdictEmoji: result.verdictEmoji,
+      verdictHeadline: result.verdictHeadline,
+      // verdictBody withheld — it's the main payoff
+      youInterest: result.youInterest,
+      themInterest: result.themInterest,
+      interestSubtext: result.interestSubtext,
+      commStyle: result.commStyle,
+      commStyleSub: null,       // withheld
+      emotionalAvail: result.emotionalAvail,
+      emotionalAvailSub: null,  // withheld
+      powerDynamic: null,       // withheld
+      powerDynamicSub: null,    // withheld
+      trajectory: null,         // withheld
+      trajectorySub: null,      // withheld
+      flags: result.flags ? result.flags.slice(0, 2) : [],
+      brutalTruths: null,       // withheld
+      nextMoves: null,          // withheld
+      paywalled: true,
+      // Full result encoded as token — verified and decoded by /api/unlock after Stripe payment
+      _token: Buffer.from(JSON.stringify(result)).toString('base64')
+    };
 
-    return res.status(200).json(result);
+    return res.status(200).json(freeResult);
 
   } catch (err) {
     console.error(err);
