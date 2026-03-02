@@ -1660,16 +1660,45 @@ function cycleLoadingText() {
 // ─────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('paid') === 'true') {
-    const saved = sessionStorage.getItem('pendingDecode');
-    if (saved) {
-      const { conv, images, relType, goalType } = JSON.parse(saved);
-      sessionStorage.removeItem('pendingDecode');
-      window.history.replaceState({}, '', window.location.pathname);
-      runDecodeWithData(conv, images || [], relType, goalType, true);
+  const sessionId = params.get('session_id');
+  if (sessionId) {
+    const token = sessionStorage.getItem('pendingToken');
+    sessionStorage.removeItem('pendingToken');
+    window.history.replaceState({}, '', window.location.pathname);
+    if (token) {
+      unlockWithSession(sessionId, token);
     }
   }
 });
+
+async function unlockWithSession(sessionId, token) {
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('loadingState').classList.add('active');
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('results').style.display = 'none';
+  cycleLoadingText();
+
+  try {
+    const response = await fetch('/api/unlock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, token })
+    });
+
+    if (!response.ok) throw new Error('Payment verification failed');
+    const result = await response.json();
+    if (result.error) throw new Error(result.error);
+
+    clearInterval(loadingInterval);
+    lastResult = result;
+    renderResults(result);
+  } catch (err) {
+    clearInterval(loadingInterval);
+    document.getElementById('loadingState').classList.remove('active');
+    document.getElementById('inputSection').style.display = 'block';
+    showError('Could not verify payment. Please contact support. (' + err.message + ')');
+  }
+}
 
 // ─────────────────────────────────────────────
 // MAIN ENTRY
@@ -1904,13 +1933,11 @@ function startCountdown(expiryMs) {
 // PAYMENT
 // ─────────────────────────────────────────────
 function handlePayment() {
-  sessionStorage.setItem('pendingDecode', JSON.stringify({
-    conv: savedConv,
-    images: savedImages,
-    relType: savedRel,
-    goalType: savedGoal
-  }));
-  const successUrl = encodeURIComponent(window.location.origin + window.location.pathname + '?paid=true');
+  // Store encoded full result token so we can unlock after Stripe confirms payment
+  if (lastResult && lastResult._token) {
+    sessionStorage.setItem('pendingToken', lastResult._token);
+  }
+  const successUrl = encodeURIComponent(window.location.origin + window.location.pathname + '?session_id={CHECKOUT_SESSION_ID}');
   window.location.href = STRIPE_PAYMENT_LINK + '?success_url=' + successUrl;
 }
 
@@ -1920,7 +1947,7 @@ function handlePayment() {
 function copyResult() {
   if (!lastResult) return;
   const r = lastResult;
-  const text = `Situationship Decoded\n\n${r.verdictHeadline}\n\nYou: ${r.youInterest}% invested | Them: ${r.themInterest}% invested\n\nThe Verdict: ${r.verdictBody}\n\nsituationshipdecoder.com`;
+  const text = `Situationship Decoded\n\n${r.verdictHeadline}\n\nYou: ${r.youInterest}% | Them: ${r.themInterest}%${r.verdictBody ? "\n\nVerdict: " + r.verdictBody : ""}\n\nsituationshipdecoder.com`;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.querySelector('.share-btn.primary');
     btn.textContent = 'Copied!';
